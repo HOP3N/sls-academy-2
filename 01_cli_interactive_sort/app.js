@@ -13,7 +13,7 @@ const sortWordsLengthAscending = (words) =>
 const getOnlyUniqueWords = (words) => [...new Set(words)];
 const getOnlyUniqueValues = (values) => [...new Set(values)];
 
-const processInput = (input) => {
+const handleInput = (input) => {
   const words = input.split(' ');
 
   const handleChoice = (choice) => {
@@ -26,10 +26,10 @@ const processInput = (input) => {
       6: getOnlyUniqueValues,
     };
 
-    const selectedOperation = operations[choice];
+    const sortedOperation = operations[choice];
 
-    if (selectedOperation) {
-      const result = selectedOperation(words);
+    if (sortedOperation) {
+      const result = sortedOperation(words);
       console.log('Result:', result.join(' '));
     } else {
       console.log('Invalid choice!');
@@ -49,8 +49,7 @@ const processInput = (input) => {
     );
   };
 
-  rl.question(
-    `
+  const prompt = `
 What would you like to see in the output? (Enter the corresponding number)
 1. Sort words alphabetically
 2. Show numbers from lesser to greater
@@ -59,17 +58,18 @@ What would you like to see in the output? (Enter the corresponding number)
 5. Show only unique words
 6. Display only unique values
 
-Enter your choice: `,
-    handleChoice
-  );
+Enter your choice: `;
+
+  rl.question(prompt, handleChoice);
 };
 
-rl.prompt();
+console.log('Enter words or numbers separated by spaces:');
+
 rl.on('line', (input) => {
   if (input === 'exit') {
     rl.close();
   } else {
-    processInput(input);
+    handleInput(input);
   }
 });
 
@@ -78,4 +78,4 @@ rl.on('close', () => {
   process.exit(0);
 });
 
-console.log('Enter words or numbers separated by spaces:');
+rl.prompt();

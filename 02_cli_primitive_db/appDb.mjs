@@ -1,16 +1,16 @@
-const fs = require('fs');
-const inquirer = require('inquirer');
+import inquirer from 'inquirer';
+import fs from 'fs';
 
 const dbPath = 'users.txt';
 
 function createUser() {
   inquirer
-    .createPromptModule([
+    .prompt([
       {
         type: 'input',
         name: 'name',
         message: 'Please enter a name (Press ENTER to finish):',
-        validate: (input) => input.trim() !== '' || 'Name is required',
+        validate: (input) => (input.trim() !== '' ? true : 'Name is required'),
       },
       {
         type: 'list',
@@ -27,17 +27,14 @@ function createUser() {
       },
     ])
     .then((answers) => {
-
       if (answers.name.trim() !== '') {
         const user = {
           name: answers.name,
           gender: answers.gender,
           age: answers.age,
         };
-
         saveUser(user);
         console.log('User information saved successfully!');
-
         createUser();
       } else {
         findUser();
@@ -52,11 +49,9 @@ function saveUser(user) {
 }
 
 function getUsers() {
-
   try {
     const data = fs.readFileSync(dbPath, 'utf8');
     return JSON.parse(data);
-
   } catch (error) {
     console.log(`Error reading database: ${error.message}`);
     return [];
@@ -73,7 +68,6 @@ function findUser() {
       },
     ])
     .then((answer) => {
-      
       if (answer.search) {
         inquirer
           .prompt([

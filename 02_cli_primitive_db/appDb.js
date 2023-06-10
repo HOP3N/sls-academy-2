@@ -39,7 +39,6 @@ function createUser() {
         console.log('User information saved successfully!');
 
         createUser();
-
       } else {
         findUser();
       }
@@ -59,11 +58,50 @@ function getUsers() {
     return JSON.parse(data);
 
   } catch (error) {
-    console.log(`Error reading database: ${error.message}`)
+    console.log(`Error reading database: ${error.message}`);
     return [];
   }
 }
 
 function findUser() {
-  
+  inquirer
+    .prompt([
+      {
+        type: 'confirm',
+        name: 'search',
+        message: 'Would you like to search for a user? (Y/N)',
+      },
+    ])
+    .then((answer) => {
+      
+      if (answer.search) {
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              name: 'searchName',
+              message: 'Enter the name of the user you want to search for:',
+            },
+          ])
+          .then((searchQuery) => {
+            const users = getUsers();
+            const foundUser = users.find(
+              (user) =>
+                user.name.toLowerCase() === searchQuery.searchName.toLowerCase()
+            );
+
+            if (foundUser) {
+              console.log('User found:');
+              console.log(foundUser);
+            } else {
+              console.log('User not found!');
+            }
+          });
+      } else {
+        console.log('Thank you and goodbye!');
+      }
+    });
 }
+
+console.log('Welcome!');
+createUser();

@@ -1,5 +1,7 @@
 const commander = require('commander');
 const TelegramBot = require('node-telegram-bot-api');
+const fs = require('fs');
+
 const bot = new TelegramBot('5615659005:AAGBL7SqnLeZsiwSWti46EnpbyGbG_8gjsg', {
   polling: false,
 });
@@ -26,16 +28,22 @@ commander
   .description('Send a photo')
   .action((path) => {
     const chatId = '1893906697';
-    bot
-      .sendMessage(chatId, path)
-      .then(() => {
-        console.log('Photo sent successfully!');
-        process.exit();
-      })
-      .catch((error) => {
-        console.error('Error sending photo:', error);
-        process.exit(1);
-      });
+    try {
+      const photo = fs.createReadStream(path);
+      bot
+        .sendPhoto(chatId, photo, { contentType: 'image/jpeg' })
+        .then(() => {
+          console.log('Photo sent successfully!');
+          process.exit();
+        })
+        .catch((error) => {
+          console.error('Error sending photo:', error.response.body);
+          process.exit(1);
+        });
+    } catch (error) {
+      console.error('Error reading photo file:', error);
+      process.exit(1);
+    }
   });
 
 commander.parse(process.argv);

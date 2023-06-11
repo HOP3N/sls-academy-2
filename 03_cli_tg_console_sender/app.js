@@ -5,12 +5,12 @@ const fs = require('fs');
 const bot = new TelegramBot('5615659005:AAGBL7SqnLeZsiwSWti46EnpbyGbG_8gjsg', {
   polling: false,
 });
+const chatId = '1893906697';
 
 commander
   .command('send-message <message>')
   .description('Send a message')
   .action((message) => {
-    const chatId = '1893906697';
     bot
       .sendMessage(chatId, message)
       .then(() => {
@@ -27,7 +27,6 @@ commander
   .command('send-photo <path>')
   .description('Send a photo')
   .action((path) => {
-    const chatId = '1893906697';
     try {
       const photo = fs.createReadStream(path);
       bot

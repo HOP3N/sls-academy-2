@@ -55,4 +55,21 @@ async function getWeatherForecast(interval) {
   }
 }
 
-// function formatForecast(forecastData, interval);
+function formatForecast(forecastData, interval) {
+  const forecastList = forecastData.list;
+  const formattedForecast = [];
+
+  for (let i = 0; i < forecastList.length; i += interval) {
+    const forecast = forecastList[i];
+    const timestamp = forecast.dt_txt;
+    const temperature = (forecast.main.temp - 273.15).toFixed(2);
+    const weatherDescription = forecast.weather[0].description;
+
+    const formattedMessage = `Timestamp: ${timestamp}\nTemperature: ${temperature}°C\nWeather: ${weatherDescription}\n`;
+
+    formattedForecast.push(formattedMessage);
+  }
+  const finalForecast = formattedForecast.join('\n');
+
+  return finalForecast;
+}

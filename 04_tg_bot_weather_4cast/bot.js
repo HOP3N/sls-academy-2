@@ -1,8 +1,9 @@
 const tgBot = require('node-telegram-bot-api');
 const axios = require('axios');
+require('dotenv').config();
 
-const botToken = '6105075218:AAGxIDvdYSs1aWn9tN08Q8htUSHzv_mOTig';
-const OWAPIKey = 'f2a4f3a37a95c9eca05cb0c01fc00be3';
+const botToken = process.env.BOT_TOKEN;
+const OWAPIKey = process.env.API_KEY;
 const city = 'Paris';
 
 const bot = new tgBot(botToken, { polling: true });

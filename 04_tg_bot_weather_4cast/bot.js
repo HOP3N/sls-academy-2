@@ -1,23 +1,24 @@
 const tgBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
-const bot = new tgBot('6105075218:AAGxIDvdYSs1aWn9tN08Q8htUSHzv_mOTig', {
-  polling: true,
-});
+const botToken = '6105075218:AAGxIDvdYSs1aWn9tN08Q8htUSHzv_mOTig';
+const OWAPIKey = 'f2a4f3a37a95c9eca05cb0c01fc00be3';
+const city = 'Paris';
 
-// const chatId = '';
+const bot = new tgBot(botToken, { polling: true });
+
+const forecastOptions = {
+  reply_markup: {
+    keyboard: [
+      ['Forecast in Paris => at intervals of 3 hours'],
+      ['Forecast in Paris => at intervals of 6 hours'],
+    ],
+    one_time_keyboard: true,
+  },
+};
 
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  const forecastOptions = {
-    reply_markup: {
-      keyboard: [
-        ['Forecast in Paris => at intervals of 3 hours'],
-        ['Forecast in Paris => at intervals of 6 hours'],
-      ],
-      one_time_keyboard: true,
-    },
-  };
   bot.sendMessage(chatId, 'Welcome! Choose an option:', forecastOptions);
 });
 
@@ -39,17 +40,20 @@ bot.onText(/Forecast in Paris => at intervals of (\d+) hours/, (msg, match) => {
 });
 
 async function getWeatherForecast(interval) {
-  const APIkey = 'f2a4f3a37a95c9eca05cb0c01fc00be3';
-  const city = 'Paris';
-  const apiURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${APIkey}`;
+  try {
+    const forecastData = await fetchWeatherForecast();
+    const formattedForecast = formatForecast(forecastData, interval);
+    return formattedForecast;
+  } catch (error) {
+    throw error;
+  }
+}
 
+async function fetchWeatherForecast() {
+  const apiURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OWAPIKey}`;
   try {
     const response = await axios.get(apiURL);
-    const forecastData = response.data;
-
-    const newForecast = formatForecast(forecastData, interval);
-
-    return newForecast;
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -66,10 +70,9 @@ function formatForecast(forecastData, interval) {
     const weatherDescription = forecast.weather[0].description;
 
     const formattedMessage = `Timestamp: ${timestamp}\nTemperature: ${temperature}°C\nWeather: ${weatherDescription}\n`;
-
     formattedForecast.push(formattedMessage);
   }
-  const finalForecast = formattedForecast.join('\n');
 
+  const finalForecast = formattedForecast.join('\n');
   return finalForecast;
 }

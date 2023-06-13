@@ -24,6 +24,7 @@ bot.onText(/\/start/, (msg) => {
 bot.onText(/Forecast in Paris => at intervals of (\d+) hours/, (msg, match) => {
   const chatId = msg.chat.id;
   const interval = parseInt(match[1]);
+
   getWeatherForecast(interval)
     .then((forecast) => {
       bot.sendMessage(chatId, forecast);
@@ -36,3 +37,22 @@ bot.onText(/Forecast in Paris => at intervals of (\d+) hours/, (msg, match) => {
       );
     });
 });
+
+async function getWeatherForecast(interval) {
+  const APIkey = 'f2a4f3a37a95c9eca05cb0c01fc00be3';
+  const city = 'Paris';
+  const apiURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${APIkey}`;
+
+  try {
+    const response = await axios.get(apiURL);
+    const forecastData = response.data;
+
+    const newForecast = formatForecast(forecastData, interval);
+
+    return newForecast;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// function formatForecast(forecastData, interval);

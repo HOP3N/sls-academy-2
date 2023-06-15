@@ -1,8 +1,11 @@
 const { getPrivatBankRate, getMonobankRate } = require('./exchangeRate');
-const { sendMessage, answerCallbackQuery } = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
 const NodeCache = require('node-cache');
 
-const cache = new NodeCache({ stdTTL: 60 }); // Cache with a TTL of 60 seconds
+const cache = new NodeCache({ stdTTL: 60 });
+
+const token = process.env.TG_BOT_TOKEN;
+const bot = new TelegramBot(token, { polling: true });
 
 function handleStart(msg) {
   const chatId = msg.chat.id;
@@ -17,7 +20,7 @@ function handleStart(msg) {
       ],
     },
   };
-  sendMessage(chatId, message, options);
+  bot.sendMessage(chatId, message, options);
 }
 
 function handleCallbackQuery(query) {
@@ -28,7 +31,7 @@ function handleCallbackQuery(query) {
 
   if (cachedRate) {
     const message = `Cached exchange rate for ${currency}: ${cachedRate}`;
-    answerCallbackQuery(query.id, { text: message });
+    bot.answerCallbackQuery(query.id, { text: message });
   } else {
     let exchangeRatePromise;
 
@@ -43,13 +46,13 @@ function handleCallbackQuery(query) {
     exchangeRatePromise
       .then((rate) => {
         const message = `Exchange rate for ${currency}: ${rate}`;
-        answerCallbackQuery(query.id, { text: message });
+        bot.answerCallbackQuery(query.id, { text: message });
         cache.set(currency, rate);
       })
       .catch((error) => {
         const errorMessage =
           'Failed to fetch exchange rate. Please try again later.';
-        answerCallbackQuery(query.id, { text: errorMessage });
+        bot.answerCallbackQuery(query.id, { text: errorMessage });
       });
   }
 }

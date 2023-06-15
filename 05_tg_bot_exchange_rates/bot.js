@@ -1,5 +1,8 @@
-const { getExchangeRate, getCachedRate, cacheRate } = require('./exchangeRate');
+const { getPrivatBankRate, getMonobankRate } = require('./exchangeRate');
 const { sendMessage, answerCallbackQuery } = require('node-telegram-bot-api');
+const NodeCache = require('node-cache');
+
+const cache = new NodeCache({ stdTTL: 60 }); // Cache with a TTL of 60 seconds
 
 function handleStart(msg) {
   const chatId = msg.chat.id;
@@ -21,17 +24,27 @@ function handleCallbackQuery(query) {
   const currency = query.data;
   const chatId = query.message.chat.id;
 
-  const cachedRate = getCachedRate(currency);
+  const cachedRate = cache.get(currency);
 
   if (cachedRate) {
     const message = `Cached exchange rate for ${currency}: ${cachedRate}`;
     answerCallbackQuery(query.id, { text: message });
   } else {
-    getExchangeRate(currency)
+    let exchangeRatePromise;
+
+    if (currency === 'usd') {
+      exchangeRatePromise = getPrivatBankRate();
+    } else if (currency === 'eur') {
+      exchangeRatePromise = getMonobankRate();
+    } else {
+      return;
+    }
+
+    exchangeRatePromise
       .then((rate) => {
         const message = `Exchange rate for ${currency}: ${rate}`;
         answerCallbackQuery(query.id, { text: message });
-        cacheRate(currency, rate);
+        cache.set(currency, rate);
       })
       .catch((error) => {
         const errorMessage =

@@ -1,4 +1,5 @@
-const exchangeRate = require('./exchangeRate');
+const { getExchangeRate, getCachedRate, cacheRate } = require('./exchangeRate');
+const { sendMessage, answerCallbackQuery } = require('node-telegram-bot-api');
 
 function handleStart(msg) {
   const chatId = msg.chat.id;
@@ -13,30 +14,29 @@ function handleStart(msg) {
       ],
     },
   };
-  tgBot.sendMessage(chatId, message, options);
+  sendMessage(chatId, message, options);
 }
 
 function handleCallbackQuery(query) {
   const currency = query.data;
   const chatId = query.message.chat.id;
 
-  const cachedRate = exchangeRate.getCachedRate(currency);
+  const cachedRate = getCachedRate(currency);
 
   if (cachedRate) {
     const message = `Cached exchange rate for ${currency}: ${cachedRate}`;
-    tgBot.answerCallbackQuery(query.id, { text: message });
+    answerCallbackQuery(query.id, { text: message });
   } else {
-    exchangeRate
-      .getExchangeRate(currency)
+    getExchangeRate(currency)
       .then((rate) => {
         const message = `Exchange rate for ${currency}: ${rate}`;
-        tgBot.answerCallbackQuery(query.id, { text: message });
-        exchangeRate.cacheRate(currency, rate);
+        answerCallbackQuery(query.id, { text: message });
+        cacheRate(currency, rate);
       })
       .catch((error) => {
         const errorMessage =
           'Failed to fetch exchange rate. Please try again later.';
-        tgBot.answerCallbackQuery(query.id, { text: errorMessage });
+        answerCallbackQuery(query.id, { text: errorMessage });
       });
   }
 }

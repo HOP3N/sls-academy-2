@@ -9,13 +9,13 @@ const bot = new TelegramBot(token, { polling: true });
 
 function handleStart(msg) {
   const chatId = msg.chat.id;
-  const message = 'Choose a currency';
+  const message = 'Choose an option:';
   const options = {
     reply_markup: {
       inline_keyboard: [
         [
-          { text: '$USD', callback_data: 'usd' },
-          { text: '€EUR', callback_data: 'eur' },
+          { text: '💰 Exchange Rates', callback_data: 'exchange' },
+          { text: '🌤️ Weather Forecast', callback_data: 'weather' },
         ],
       ],
     },
@@ -24,40 +24,43 @@ function handleStart(msg) {
 }
 
 function handleCallbackQuery(query) {
-  const currency = query.data;
+  const option = query.data;
   const chatId = query.message.chat.id;
 
-  const cachedRate = cache.get(currency);
-
-  if (cachedRate) {
-    const message = `Cached exchange rate for ${currency}: ${cachedRate}`;
-    bot.answerCallbackQuery(query.id, { text: message });
-  } else {
-    let exchangeRatePromise;
-
-    if (currency === 'usd') {
-      exchangeRatePromise = getPrivatBankRate();
-    } else if (currency === 'eur') {
-      exchangeRatePromise = getMonobankRate();
-    } else {
-      return;
-    }
-
-    exchangeRatePromise
-      .then((rate) => {
-        const message = `Exchange rate for ${currency}: ${rate}`;
-        bot.answerCallbackQuery(query.id, { text: message });
-        cache.set(currency, rate);
-      })
-      .catch((error) => {
-        const errorMessage =
-          'Failed to fetch exchange rate. Please try again later.';
-        bot.answerCallbackQuery(query.id, { text: errorMessage });
-      });
+  if (option === 'exchange') {
+    const exchangeMessage = 'Choose a currency:';
+    const exchangeOptions = {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '$USD', callback_data: 'usd' },
+            { text: '€EUR', callback_data: 'eur' },
+          ],
+        ],
+      },
+    };
+    bot.sendMessage(chatId, exchangeMessage, exchangeOptions);
+  } else if (option === 'weather') {
+    // Implement weather forecast logic here
+    const weatherMessage = 'Enter the location for weather forecast:';
+    const weatherOptions = {
+      reply_markup: {
+        force_reply: true,
+      },
+    };
+    bot.sendMessage(chatId, weatherMessage, weatherOptions);
   }
+}
+
+function handleWeatherInput(msg) {
+  const chatId = msg.chat.id;
+  const location = msg.text;
+  const weatherForecast = 'The weather forecast for ' + location + ' is ...';
+  bot.sendMessage(chatId, weatherForecast);
 }
 
 module.exports = {
   handleStart,
   handleCallbackQuery,
+  handleWeatherInput,
 };

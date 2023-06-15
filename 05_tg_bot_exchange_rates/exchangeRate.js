@@ -29,7 +29,9 @@ async function getMonobankRate() {
     // Find the exchange rate for EUR
     const eurRate = data.find(
       (currency) =>
-        currency.currencyCodeA === 978 && currency.currencyCodeB === 980
+        currency.currencyCodeA === 978 &&
+        currency.currencyCodeB === 980 &&
+        currency.rateBuy
     );
     if (eurRate) {
       return eurRate.rateBuy;

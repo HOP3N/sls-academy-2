@@ -27,7 +27,7 @@ function handleCallbackQuery(query) {
     tgBot.answerCallbackQuery(query.id, { text: message });
   } else {
     exchangeRate
-      .getCachedRate(currency)
+      .getExchangeRate(currency)
       .then((rate) => {
         const message = `Exchange rate for ${currency}: ${rate}`;
         tgBot.answerCallbackQuery(query.id, { text: message });

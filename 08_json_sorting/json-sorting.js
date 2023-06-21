@@ -24,8 +24,7 @@ const endpoints = [
 ];
 
 async function queryEndpoint(endpoint) {
-  
-    try {
+  try {
     const res = await axios.get(endpoint);
     const data = res.data;
 
@@ -46,16 +45,16 @@ async function executeQueries() {
   let falseCount = 0;
 
   for (const endpoint of endpoints) {
-
     let isDone = null;
     for (let i = 0; i < 3; i += 1) {
       isDone = await queryEndpoint(endpoint);
 
-      if (isDone !== null) break;
+      if (isDone !== null) {
+        break;
+      }
     }
 
     if (isDone !== null) {
-
       if (isDone) {
         trueCount++;
       } else {

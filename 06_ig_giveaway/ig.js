@@ -6,35 +6,36 @@ function readFile(file) {
 }
 
 function uniqueValues() {
-  const UniqueWords = new Set();
+  const uniqueUsernames = new Set();
 
-  for (let i = 1; i <= 20; i += 1) {
-    const wordsArray = readFile(`file${i}.txt`);
-    wordsArray.forEach((word) => UniqueWords.add(word));
+  for (let i = 1; i <= 19; i += 1) {
+    const wordsArray = readFile(`out${i}.txt`);
+    wordsArray.forEach((word) => uniqueUsernames.add(word));
   }
 
-  return UniqueWords.size;
+  return uniqueUsernames.size;
 }
 
 function yesInAll() {
-  let commonUsers = [];
+  let commonUsernames = [];
 
-  commonUsers = readFile('file1.txt');
+  commonUsernames = readFile('out0.txt');
 
-  for (let i = 2; i <= 20; i += 1) {
-    const words = readFile(`file${i}.txt`);
-    commonUsers = commonUsers.filter((username) => words.includes(username));
+  for (let i = 1; i <= 19; i += 1) {
+    const words = readFile(`out${i}.txt`);
+    commonUsernames = commonUsernames.filter((username) => words.includes(username));
   }
 
-  return commonUsers.length;
+  return commonUsernames.length;
 }
 
 function yesInAtLeastTen() {
   const usernames = {};
 
-  for (let i = 1; i <= 20; i += 1) {
-    const words = readFile(`file${i}.txt`);
+  for (let i = 0; i <= 19; i += 1) {
+    const words = readFile(`out${i}.txt`);
     words.forEach((username) => {
+
       if (usernames[username]) {
         usernames[username]++;
       } else {
@@ -45,6 +46,7 @@ function yesInAtLeastTen() {
 
   let count = 0;
   for (const username in usernames) {
+    
     if (usernames[username] >= 10) {
       count++;
     }

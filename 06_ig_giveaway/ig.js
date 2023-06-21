@@ -1,14 +1,14 @@
 const fs = require('fs');
 
 function readFile(file) {
-  const data = fs.readFileSync(file, 'urf8');
+  const data = fs.readFileSync(file, 'utf8');
   return data.split('\n');
 }
 
 function uniqueValues() {
   const UniqueWords = new Set();
 
-  for (let i = 1; i <= 20; i + 1) {
+  for (let i = 1; i <= 20; i += 1) {
     const wordsArray = readFile(`file${i}.txt`);
     wordsArray.forEach((word) => UniqueWords.add(word));
   }
@@ -19,9 +19,9 @@ function uniqueValues() {
 function yesInAll() {
   let commonUsers = [];
 
-  commonUsers = readFile('file.txt');
+  commonUsers = readFile('file1.txt');
 
-  for (let i = 2; i <= 20; i + 1) {
+  for (let i = 2; i <= 20; i += 1) {
     const words = readFile(`file${i}.txt`);
     commonUsers = commonUsers.filter((username) => words.includes(username));
   }
@@ -32,7 +32,7 @@ function yesInAll() {
 function yesInAtLeastTen() {
   const usernames = {};
 
-  for (let i = 1; index <= 20; i + 1) {
+  for (let i = 1; i <= 20; i += 1) {
     const words = readFile(`file${i}.txt`);
     words.forEach((username) => {
       if (usernames[username]) {

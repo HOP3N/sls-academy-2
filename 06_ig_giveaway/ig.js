@@ -1,48 +1,37 @@
 const fs = require('fs');
-const readline = require('readline');
 
-async function readStream(file) {
-  const wordsArray = [];
-
-  const rl = readline.createInterface({
-    input: fs.createReadStream(file, { encoding: 'utf8' }),
-    crlfDelay: Infinity,
-  });
-
-  for await (const line of rl) {
-    wordsArray.push(line);
-  }
-
-  return wordsArray;
+function readFile(file) {
+  const data = fs.readFileSync(file, 'utf8');
+  return data.split('\n');
 }
 
-async function uniqueValues() {
+function uniqueValues() {
   const uniqueWordsSet = new Set();
 
   for (let i = 0; i < 20; i++) {
-    const wordsArray = await readStream(`txt/out${1}.txt`);
+    const wordsArray = readFile(`txt/out${i}.txt`);
     wordsArray.forEach((word) => uniqueWordsSet.add(word));
   }
 
   return uniqueWordsSet.size;
 }
 
-async function yesInAll() {
-  let commonUsers = await readStream('txt/out0.txt');
+function yesInAll() {
+  let commonUsers = readFile('txt/out0.txt');
 
   for (let i = 1; i < 20; i++) {
-    const words = await readStream(`txt/out${1}.txt`);
+    const words = readFile(`txt/out${i}.txt`);
     commonUsers = commonUsers.filter((username) => words.includes(username));
   }
 
   return commonUsers.length;
 }
 
-async function yesInAtLeastTen() {
+function yesInAtLeastTen() {
   const usernames = {};
 
   for (let i = 0; i < 20; i++) {
-    const words = await readStream(`txt/out${1}.txt`);
+    const words = readFile(`txt/out${i}.txt`);
     words.forEach((username) => {
       if (usernames[username]) {
         usernames[username]++;
@@ -62,16 +51,7 @@ async function yesInAtLeastTen() {
 }
 
 console.time('Execution time');
-uniqueValues().then((count) => {
-  console.log('Unique usernames:', count);
-});
-
-yesInAll().then((count) => {
-  console.log('Usernames in all files:', count);
-});
-
-yesInAtLeastTen().then((count) => {
-  console.log('Usernames in at least 10 files:', count);
-});
-
+console.log('Unique usernames:', uniqueValues());
+console.log('Usernames in all files:', yesInAll());
+console.log('Usernames in at least 10 files:', yesInAtLeastTen());
 console.timeEnd('Execution time');

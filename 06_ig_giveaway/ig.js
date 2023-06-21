@@ -1,41 +1,49 @@
 const fs = require('fs');
+const readline = require('readline');
 
-function readFile(file) {
-  const data = fs.readFileSync(file, 'utf8');
-  return data.split('\n');
-}
+async function readStream(file) {
+  const wordsArray = [];
 
-function uniqueValues() {
-  const uniqueUsernames = new Set();
+  const rl = readline.createInterface({
+    input: fs.createReadStream(file, { encoding: 'utf8' }),
+    crlfDelay: Infinity,
+  });
 
-  for (let i = 1; i <= 19; i += 1) {
-    const wordsArray = readFile(`out${i}.txt`);
-    wordsArray.forEach((word) => uniqueUsernames.add(word));
+  for await (const line of rl) {
+    wordsArray.push(line);
   }
 
-  return uniqueUsernames.size;
+  return wordsArray;
 }
 
-function yesInAll() {
-  let commonUsernames = [];
+async function uniqueValues() {
+  const uniqueWordsSet = new Set();
 
-  commonUsernames = readFile('out0.txt');
-
-  for (let i = 1; i <= 19; i += 1) {
-    const words = readFile(`out${i}.txt`);
-    commonUsernames = commonUsernames.filter((username) => words.includes(username));
+  for (let i = 0; i < 20; i++) {
+    const wordsArray = await readStream(`txt/out${1}.txt`);
+    wordsArray.forEach((word) => uniqueWordsSet.add(word));
   }
 
-  return commonUsernames.length;
+  return uniqueWordsSet.size;
 }
 
-function yesInAtLeastTen() {
+async function yesInAll() {
+  let commonUsers = await readStream('txt/out0.txt');
+
+  for (let i = 1; i < 20; i++) {
+    const words = await readStream(`txt/out${1}.txt`);
+    commonUsers = commonUsers.filter((username) => words.includes(username));
+  }
+
+  return commonUsers.length;
+}
+
+async function yesInAtLeastTen() {
   const usernames = {};
 
-  for (let i = 0; i <= 19; i += 1) {
-    const words = readFile(`out${i}.txt`);
+  for (let i = 0; i < 20; i++) {
+    const words = await readStream(`txt/out${1}.txt`);
     words.forEach((username) => {
-
       if (usernames[username]) {
         usernames[username]++;
       } else {
@@ -46,7 +54,6 @@ function yesInAtLeastTen() {
 
   let count = 0;
   for (const username in usernames) {
-    
     if (usernames[username] >= 10) {
       count++;
     }
@@ -55,7 +62,16 @@ function yesInAtLeastTen() {
 }
 
 console.time('Execution time');
-console.log('Unique usernames:', uniqueValues());
-console.log('Usernames in all files:', yesInAll());
-console.log('Usernames in at least 10 files:', yesInAtLeastTen());
+uniqueValues().then((count) => {
+  console.log('Unique usernames:', count);
+});
+
+yesInAll().then((count) => {
+  console.log('Usernames in all files:', count);
+});
+
+yesInAtLeastTen().then((count) => {
+  console.log('Usernames in at least 10 files:', count);
+});
+
 console.timeEnd('Execution time');

@@ -30,11 +30,10 @@ async function queryEndpoint(endpoint) {
 
     if (data && data.isDone !== undefined) {
       console.log(`[Success] ${endpoint}: isDone - ${data.isDone}`);
-
       return data.isDone;
     }
   } catch (error) {
-    console.log(`[Fail] ${endpoint}: ${error.message}`);
+    console.log(`[Fail] ${endpoint}: The endpoint is unavailable`);
   }
 
   return null;
@@ -46,6 +45,7 @@ async function executeQueries() {
 
   for (const endpoint of endpoints) {
     let isDone = null;
+
     for (let i = 0; i < 3; i += 1) {
       isDone = await queryEndpoint(endpoint);
 
@@ -60,11 +60,14 @@ async function executeQueries() {
       } else {
         falseCount++;
       }
+    } else {
+      console.log(`[Fail] ${endpoint}: The endpoint is unavailable`);
     }
   }
 
   console.log(`Found True values: ${trueCount}`);
   console.log(`Found False values: ${falseCount}`);
+  console.log(`Total Endpoints: ${endpoints.length}`);
 }
 
 executeQueries();
